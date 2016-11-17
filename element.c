@@ -1,4 +1,12 @@
-
+int group(struct Element *p) {
+    int n;
+    for (n = 0; n < 5; n++) {
+        if (p->shells[n][0][0] == 0) {
+            break;
+        }
+    }
+    return n;
+}
 
 void get_shells(struct Element * p) {
     /**
@@ -132,7 +140,7 @@ float predict_valence_electron_energy(struct Element *p) {
 }
 
 void print_element(struct Element *p) {
-    printf("Name:\t\t\t%s\nSmall:\t\t\t%s\nAtomic Number:\t\t%d\nMolar Mass:\t\t%0.2f\nAtomic Radius:\t\t%0.2f\nElectronegativity:\t%0.2f\nEnergy:\t\t\t%0.2f eV\nElectrons;  \n", p->name, p->small, p->atomic_number, p->molar, p->atomic_radius, p->electronegativity, predict_valence_electron_energy(p));
+    printf("Name:\t\t\t%s\nSmall:\t\t\t%s\nGroup:\t\t\t%d\nAtomic Number:\t\t%d\nMolar Mass:\t\t%0.2f\nAtomic Radius:\t\t%0.2f\nElectronegativity:\t%0.2f\nEnergy:\t\t\t%0.2f eV\nElectrons;  \n", p->name, p->small, group(p), p->atomic_number, p->molar, p->atomic_radius, p->electronegativity, predict_valence_electron_energy(p));
     int c, w, n, l, m;
     char ns[4] = {'s', 'p', 'd', 'f'};
     char ls[4][5][6] = {   {"","","","",""},
@@ -202,3 +210,4 @@ int is_element_cation(struct Element *p) {
     }
     return -1;
 }
+
