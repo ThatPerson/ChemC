@@ -15,4 +15,5 @@ struct Compound {
     struct Element constituents[50];
     char name[50];
     float molar;
+    int num_constituents;
 };

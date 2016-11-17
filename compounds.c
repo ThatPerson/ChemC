@@ -2,8 +2,8 @@ float predict_melting_point(struct Compound * q, int algorithm) {
     float melting_point = 0;
     if (algorithm == 0) {
         int i;
-        int Z[3] = {0, 0, 0}, N[2] = {0, 0};
-        for (i = 0; i < arrlen(q->constituents); i++) {
+        int Z[3] = {0, 0, 0}, N[3] = {0, 0, 0};
+        for (i = 0; i < q->num_constituents; i++) {
             Z[1+is_element_cation(&q->constituents[i])] = q->constituents[i].atomic_number;
             N[1+is_element_cation(&q->constituents[i])] = group(&q->constituents[i]);
         }
@@ -14,7 +14,7 @@ float predict_melting_point(struct Compound * q, int algorithm) {
     } else {
         int n[3] = {0, 0, 0}, c[3] = {0, 0, 0}, i;
         float d[3] = {0, 0, 0};
-        for (i = 0; i < arrlen(q->constituents); i++) {
+        for (i = 0; i < q->num_constituents; i++) {
             int tmp = 1 + is_element_cation(&q->constituents[i]);
             n[tmp]++;
             c[tmp] += atom_valency(&q->constituents[i]);
