@@ -36,3 +36,80 @@ float predict_melting_point(struct Compound * q, int algorithm) {
 
 /* Find constituents function - for now just don't */
 
+int find_constituents(struct Compound *q) {
+    /**
+     * Sometimes in life it's best just not to ask.
+     */
+    int multiplicative_factor = 1;
+    int i, qs = 0;
+    if (48 <= q->name[0] && q->name[0] <= 57) {
+        qs = 1;
+        multiplicative_factor = (q->name[0] - 48);
+    }
+
+    char constituents[50][3];
+    int current = 0,r;
+    char buffer[3] = {' ',' ',' '};
+    int current_buf = 0;
+    int multiplt = 0;
+    for (i = qs; i < strlen(q->name); i++) {
+        if (48 <= q->name[i] && q->name[i] <= 57) {
+            multiplt = (10 * multiplt) + (q->name[i] - 48);
+        }
+        if (current_buf > 2) {
+            current_buf = 0;
+        }
+        if (65 <= q->name[i] && q->name[i] <= 90) {
+            if (strlen(buffer) > 0) {
+                if (multiplt == 0)
+                    multiplt = 1;
+                for (r = 0; r < multiplt; r++) {
+                    strcpy(constituents[current], buffer);
+                    current++;
+                }
+                multiplt = 0;
+            }
+            current_buf = 0;
+            buffer[0] = 0;
+            buffer[1] = 0;
+            buffer[2] = 0;
+            buffer[current_buf] = q->name[i];
+            current_buf++;
+        } else if (97 <= q->name[i] && q->name[i] <= 122) {
+            buffer[current_buf] = q->name[i];
+            current_buf++;
+        }
+
+    }
+
+    if (multiplt == 0)
+        multiplt = 1;
+    for (r = 0; r < multiplt; r++) {
+        strcpy(constituents[current], buffer);
+        current++;
+    }
+    int n = 0;
+    for (r = 0; r < multiplicative_factor; r++) {
+        for (i = 1; i < current; i++) {
+            q->constituents[n] = periodic_table[find_element(constituents[i])];
+            n++;
+        }
+    }
+    q->num_constituents = n;
+    return 1;
+}
+
+
+/*
+Char	Dec	Hex	Oct
+A	65	41	101
+Z	90	5A	132
+13	0D	15
+10	0A	12
+a	97	61	141
+z	122	7A	172
+13	0D	15
+10	0A	12
+0	48	30	60
+9	57	39	71
+*/

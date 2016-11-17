@@ -82,10 +82,11 @@ int main(int argc, char **argv) {
     }
     
     struct Compound NaCl;
-    NaCl.constituents[0] = periodic_table[find_element("Na")];
-    NaCl.constituents[1] = periodic_table[find_element("Cl")];
-    NaCl.num_constituents = 2;
-    printf("%f///%f\n", predict_melting_point(&NaCl, 1), predict_melting_point(&NaCl, 0));
+    strcpy(NaCl.name, "NaF");
+    find_constituents(&NaCl);
+    print_element(&NaCl.constituents[0]);
+    
+    printf("%f\n", predict_melting_point(&NaCl, 0));
     
     return 0;
 }
