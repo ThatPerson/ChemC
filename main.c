@@ -98,6 +98,18 @@ void get_shells(struct Element * p) {
     return;
 }
 
+int length(int q[50]) {
+    int i = 0;
+    while (q[i] != 0) {
+        printf("%d\n", i);
+        if (q[i] == 0) {
+            return i -1;
+        }
+        i++;
+    }
+    return i-1;
+}
+
 float predict_electron_energy(struct Element * p, int n, int l, int m, int x, int legacy) {
     /**
      * Purpose:     Predict the energy of an electron in n l m.
@@ -114,7 +126,15 @@ float predict_electron_energy(struct Element * p, int n, int l, int m, int x, in
         energy = -RYDBERG * (pow(Z, 2) / pow(n, 2));
     } else {
         int S = 0;
-        int s_n = n - 1, s_l = l, s_m = m;
+        int i, j, k, s_n = n - 1, s_l = l, s_m = m;
+        int p[3] = {0, 0, 0};
+        for (i = 0; i < s_l; i++) {
+            for (j = 0; j < length(p.shells[s_n][i]); j++) {
+                p[0] += p->shells[s_n][i][j];
+                p[0]--;
+            }
+        }
+        
     }
         
     
@@ -150,5 +170,8 @@ int main(int argc, char **argv) {
     }
     printf("%s\n", periodic_table[2].name);
 
+    int s[5] = {2, 3, 1, 1, 1};
+    printf("%d\n", length(s));
+    
     return 0;
 }
