@@ -4,11 +4,11 @@
 #include <string.h>
 
 // Define constants.
-#define BOLTZMANN 1.23 * pow(10, -23); // Boltzmann constants
-#define AVOGADRO 6.02*pow(10, 23); // Avogadro's number
-#define PLANCK 6.626 * pow(10, -34); // Planck's Constant
-#define MP_K 1.2025*pow(10, -4); // Melting point prediction constants.
-#define MP_D 3.45*pow(10, -11);
+#define BOLTZMANN 1.23 * pow(10, -23) // Boltzmann constants
+#define AVOGADRO 6.02*pow(10, 23) // Avogadro's number
+#define PLANCK 6.626 * pow(10, -34) // Planck's Constant
+#define MP_K 1.2025*pow(10, -4) // Melting point prediction constants.
+#define MP_D 3.45*pow(10, -11)
 #define RYDBERG 13.6057
 
 // Haxxy stuff
@@ -21,6 +21,7 @@ struct Element periodic_table[500];
 int pt_length = 0;
 
 #include "element.c"
+#include "compounds.c"
 
 
 
@@ -79,6 +80,11 @@ int main(int argc, char **argv) {
             print_element(&periodic_table[find_element(argv[i+1])]);
         }
     }
+    
+    struct Compound NaCl;
+    NaCl.constituents[0] = periodic_table[find_element("Na")];
+    NaCl.constituents[1] = periodic_table[find_element("Cl")];
+    printf("%f///%f\n", predict_melting_point(&NaCl, 1), predict_melting_point(&NaCl, 0));
     
     return 0;
 }
