@@ -99,6 +99,48 @@ int find_constituents(struct Compound *q) {
     return 1;
 }
 
+char * find_name(struct Compound * q) {
+    char chemicals[50][3];
+    int number_of[50];
+    static char output[500] = "";
+    int i, n, p, c = 0;
+    for (i = 0; i < 50; i++) {
+        number_of[i] = 0;
+    }
+    for (i = 0; i < q->num_constituents; i++) {
+        n = 0;
+        for (p = 0; p < 50; p++) {
+            if (strcmp(chemicals[p], q->constituents[i].small) == 0) {
+                n = 1;
+                number_of[p]++;
+            }
+        }
+        if (n == 0) {
+            strcpy(chemicals[c], q->constituents[i].small);
+            number_of[c] = 1;
+            c++; // ay
+        }
+    }
+    
+    strcpy(output, "");
+    for (i = 0; i < sizeof(chemicals)/sizeof(chemicals[0]); i++) {
+        if (number_of[i] > 1)
+            sprintf(output, "%s%s%d", output, chemicals[i], number_of[i]);
+        else if (number_of[i] == 1)
+            sprintf(output, "%s%s", output, chemicals[i]);
+    }
+    return output;
+}
+            
+            
+float compound_molarity(struct Compound *q) {
+    int i;
+    float molar = 0;
+    for (i = 0; i < q->num_constituents; i++) {
+        molar += q->constituents[i].molar;
+    }
+    return molar;
+}
 
 /*
 Char	Dec	Hex	Oct

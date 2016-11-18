@@ -88,5 +88,9 @@ int main(int argc, char **argv) {
     
     printf("%f\n", predict_melting_point(&NaCl, 0));
     
+
+    printf("%s %f\n", find_name(&NaCl), compound_molarity(&NaCl));
+    strcpy(NaCl.name, find_name(&NaCl));
+    
     return 0;
 }
