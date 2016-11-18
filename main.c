@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
     }
     
     struct Compound NaCl;
-    strcpy(NaCl.name, "NaF");
+    strcpy(NaCl.name, "CH3OH");
     find_constituents(&NaCl);
     print_element(&NaCl.constituents[0]);
     
@@ -91,6 +91,13 @@ int main(int argc, char **argv) {
 
     printf("%s %f\n", find_name(&NaCl), compound_molarity(&NaCl));
     strcpy(NaCl.name, find_name(&NaCl));
+    struct Bond bonds[50];
     
+    int q = predict_bonding(bonds,50, &NaCl);
+    printf("%s\n", bonds[0].atoms[0].name);
+    char bond_type[5][10] = {"single", "double", "triple", "quadruple", "quintiple"};
+    for (i = 0; i < q; i++) {
+        printf("%s is involved in a %s bond with %s\n", bonds[i].atoms[0].name, bond_type[bonds[i].num_bonds], bonds[i].atoms[1].name);
+    }
     return 0;
 }

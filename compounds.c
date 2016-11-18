@@ -131,7 +131,78 @@ char * find_name(struct Compound * q) {
     }
     return output;
 }
-            
+        
+int get_electronegative(struct Compound *q, int type) {
+    int current_lowest = 0, current_atom = 0, i;
+    if (q->num_constituents > 0) {
+        current_lowest = q->constituents[0].electronegativity;
+        current_atom = 0;
+    } else {
+        return -1; // No atoms
+    }
+    for (i = 0; i < q->num_constituents; i++) {
+        if (type == 1) {
+            if (q->constituents[i].electronegativity > current_lowest && q->constituents[i].present == 1) {
+                current_lowest = q->constituents[i].electronegativity;
+                current_atom = i;
+            }
+        } else {
+            if (q->constituents[i].electronegativity < current_lowest && q->constituents[i].present == 1) {
+                current_lowest = q->constituents[i].electronegativity;
+                current_atom = i;
+            }
+        }
+    }
+    return current_atom;
+}
+    
+int predict_bonding(struct Bond * bonds, int length, struct Compound * q) {
+    int c_left = q->num_constituents;
+    int i;
+    for (i = 0; i < q->num_constituents; i++) {
+        q->constituents[i].valency = atom_valency(&q->constituents[i]);
+    }
+    int current_bond = 0, current_atom;
+    int last_atom = get_electronegative(q, 0), p = 0;
+    for (i = 0; i < c_left; i++) {
+        if (strcmp(q->constituents[i].small, q->constituents[last_atom].small) == 0 && p == 0) {
+            q->constituents[i].present = 0;
+            p = 1;
+        } else {
+            q->constituents[i].present = 1;
+        }
+    }
+    c_left--;
+    int n = 0;
+    while (c_left > 0) {
+        n = (n == 0) ? 1 : 0;
+        current_atom = get_electronegative(q, n);
+        for (i = 0; i < q->num_constituents; i++) {
+            if (strcmp(q->constituents[i].small, q->constituents[current_atom].small) == 0 && q->constituents[i].present == 1) {
+                if (q->constituents[last_atom].valency >= q->constituents[current_atom].valency) {
+                    q->constituents[last_atom].valency -= q->constituents[current_atom].valency;
+                    bonds[current_bond].atoms[0] = q->constituents[last_atom];
+                    bonds[current_bond].atoms[1] = q->constituents[current_atom];
+                    bonds[current_bond].num_bonds = q->constituents[current_atom].valency;
+                    current_bond++;
+                    q->constituents[current_atom].valency = 0;
+                    q->constituents[i].present = 0;
+                    c_left--;
+                } else if (q->constituents[last_atom].valency < q->constituents[current_atom].valency) {
+                    bonds[current_bond].atoms[0] = q->constituents[last_atom];
+                    bonds[current_bond].atoms[1] = q->constituents[current_atom];
+                    bonds[current_bond].num_bonds = q->constituents[current_atom].valency - q->constituents[last_atom].valency;
+                    current_bond++;
+                    q->constituents[i].present = 0;
+                    c_left--;
+                    last_atom = current_atom;
+                }
+            }
+        }
+    }
+    return current_bond - 1;
+}
+
             
 float compound_molarity(struct Compound *q) {
     int i;
@@ -141,6 +212,8 @@ float compound_molarity(struct Compound *q) {
     }
     return molar;
 }
+
+
 
 /*
 Char	Dec	Hex	Oct
