@@ -78,26 +78,32 @@ int main(int argc, char **argv) {
             printf("Script in %s\n", argv[i+1]);
         } else if (strcmp(argv[i], "-e") == 0) {
             print_element(&periodic_table[find_element(argv[i+1])]);
+        } else if (strcmp(argv[i], "-c") == 0) {
+            struct Compound NaCl;
+            strcpy(NaCl.name, argv[i+1]);
+            find_constituents(&NaCl);
+
+            printf("%s %f\n", find_name(&NaCl), compound_molarity(&NaCl));
+            
+            strcpy(NaCl.name, find_name(&NaCl));
+            struct Bond bonds[50];
+            
+            int q = predict_bonding(bonds,50, &NaCl);
+            
+            char bond_type[5][10] = {"single", "single", "double", "triple", "quadruple"};
+            int c = q;
+            if (c < 1)
+                c = 1;
+    
+            for (i = 0; i < c; i++) {
+                if (strcmp(bonds[i].atoms[0].name, "") != 0) {
+                    printf("%s is involved in a %s bond with %s\n", bonds[i].atoms[0].name, bond_type[bonds[i].num_bonds], bonds[i].atoms[1].name);
+                }
+            }
+
         }
     }
     
-    struct Compound NaCl;
-    strcpy(NaCl.name, "CH3OH");
-    find_constituents(&NaCl);
-    print_element(&NaCl.constituents[0]);
     
-    printf("%f\n", predict_melting_point(&NaCl, 0));
-    
-
-    printf("%s %f\n", find_name(&NaCl), compound_molarity(&NaCl));
-    strcpy(NaCl.name, find_name(&NaCl));
-    struct Bond bonds[50];
-    
-    int q = predict_bonding(bonds,50, &NaCl);
-    printf("%s\n", bonds[0].atoms[0].name);
-    char bond_type[5][10] = {"single", "double", "triple", "quadruple", "quintiple"};
-    for (i = 0; i < q; i++) {
-        printf("%s is involved in a %s bond with %s\n", bonds[i].atoms[0].name, bond_type[bonds[i].num_bonds], bonds[i].atoms[1].name);
-    }
     return 0;
 }
