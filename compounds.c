@@ -9,7 +9,7 @@ float predict_melting_point(struct Compound * q, int algorithm) {
         }
         if (N[1] == 0 || N[2] == 0)
             return -1;
-        melting_point = abs(RYDBERG * (pow(Z[2]/N[2], 2) - pow(Z[1]/N[1], 2)));
+        melting_point = fabs(RYDBERG * (pow(Z[2]/N[2], 2) - pow(Z[1]/N[1], 2)));
         melting_point = -0.101334 * melting_point + 1109.81;
     } else {
         int n[3] = {0, 0, 0}, c[3] = {0, 0, 0}, i;
@@ -121,7 +121,7 @@ char * find_name(struct Compound * q) {
             c++; // ay
         }
     }
-    
+
     strcpy(output, "");
     for (i = 0; i < sizeof(chemicals)/sizeof(chemicals[0]); i++) {
         if (number_of[i] > 1)
@@ -131,7 +131,7 @@ char * find_name(struct Compound * q) {
     }
     return output;
 }
-        
+
 int get_electronegative(struct Compound *q, int type) {
     int current_lowest = 0, current_atom = 0, i;
     if (q->num_constituents > 0) {
@@ -155,12 +155,37 @@ int get_electronegative(struct Compound *q, int type) {
     }
     return current_atom;
 }
-    
+
+int get_electronegative_m(struct Mixture *q, int type) {
+    int current_lowest = 0, current_atom = 0, i;
+    if (q->num_constituents > 0) {
+        current_lowest = q->constituents[0].electronegativity;
+        current_atom = 0;
+    } else {
+        return -1; // No atoms
+    }
+    for (i = 0; i < q->num_constituents; i++) {
+        if (type == 1) {
+            if (q->constituents[i].electronegativity > current_lowest && q->constituents[i].present == 1) {
+                current_lowest = q->constituents[i].electronegativity;
+                current_atom = i;
+            }
+        } else {
+            if (q->constituents[i].electronegativity < current_lowest && q->constituents[i].present == 1) {
+                current_lowest = q->constituents[i].electronegativity;
+                current_atom = i;
+            }
+        }
+    }
+    return current_atom;
+}
+
 int predict_bonding(struct Bond * bonds, int length, struct Compound * q) {
     int c_left = q->num_constituents;
     int i;
     for (i = 0; i < q->num_constituents; i++) {
         q->constituents[i].valency = atom_valency(&q->constituents[i]);
+        q->constituents[i].present = 1;
     }
     int current_bond = 0, current_atom;
     int last_atom = get_electronegative(q, 0), p = 0;
@@ -203,7 +228,29 @@ int predict_bonding(struct Bond * bonds, int length, struct Compound * q) {
     return current_bond - 1;
 }
 
-            
+int predict_ir(float * ir, struct Bond * bonds, int num_bonds) {
+    float reduced_mass, tmp;
+    int i, p, j, current_id;
+    for (i = 0; i < 50; i++)
+        ir[i] = 0;
+    for (i = 0; i < num_bonds; i++) {
+        reduced_mass = (bonds[i].atoms[0].molar * bonds[i].atoms[1].molar) / (bonds[i].atoms[0].molar + bonds[i].atoms[1].molar);
+        tmp = 4.12*sqrt((5*pow(10, 5) * bonds[i].num_bonds)/reduced_mass);
+        j = 0;
+        for (p = 0; p < current_id; p++) {
+            if (ir[p] == tmp) {
+                j = 1;
+            }
+        }
+        if (j == 0) {
+            ir[current_id] = tmp;
+            current_id++;
+        }
+    }
+    return current_id;
+}
+
+
 float compound_molarity(struct Compound *q) {
     int i;
     float molar = 0;
