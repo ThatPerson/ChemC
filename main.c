@@ -22,21 +22,21 @@ int pt_length = 0;
 
 #include "element.c"
 #include "compounds.c"
-
+#include "reaction.c"
 
 
 void read_periodic_table(char * filename) {
     FILE* reading;
     int current = 0;
     reading = fopen(filename, "r");
-    
+
     while (!feof(reading)) {
         fscanf(reading, "%s %s %d %f %d %f %f", periodic_table[current].name, periodic_table[current].small, &periodic_table[current].position, &periodic_table[current].molar, &periodic_table[current].atomic_number, &periodic_table[current].electronegativity, &periodic_table[current].atomic_radius);
         periodic_table[current].num_electrons = periodic_table[current].atomic_number;
         current++;
     }
     pt_length = current - 1;
-    
+
     fclose(reading);
     return;
 }
@@ -62,12 +62,12 @@ int initialise(char * datafile) {
 }
 
 int main(int argc, char **argv) {
-    
+
     /*Testing code. Just so I don't have to pass args*/
     initialise("data.dat");
     /* end */
-    
-    
+
+
     int i;
     for (i = 0; i < argc - 1; i++) {
         if (strcmp(argv[i], "-pt") == 0) {
@@ -78,32 +78,54 @@ int main(int argc, char **argv) {
             printf("Script in %s\n", argv[i+1]);
         } else if (strcmp(argv[i], "-e") == 0) {
             print_element(&periodic_table[find_element(argv[i+1])]);
+        } else if (strcmp(argv[i], "-l") == 0) {
+            if (i < argc-2)
+                printf("%0.3f\n", periodic_table[find_element(argv[i+1])].atomic_radius + periodic_table[find_element(argv[i+2])].atomic_radius);
+            else
+                printf("%0.3f\n", 2*periodic_table[find_element(argv[i+1])].atomic_radius);
+        } else if (strcmp(argv[i], "-m") == 0) {
+            if (i < argc-2) {
+                float m[2] = {periodic_table[find_element(argv[i+1])].molar, periodic_table[find_element(argv[i+2])].molar};
+                printf("%0.3f\n", (m[0]*m[1])/(m[0]+m[1]));
+              } else {
+                float m = periodic_table[find_element(argv[i+1])].molar;
+                printf("%0.3f\n", m/2);
+              }
         } else if (strcmp(argv[i], "-c") == 0) {
             struct Compound NaCl;
             strcpy(NaCl.name, argv[i+1]);
             find_constituents(&NaCl);
 
             printf("%s %f\n", find_name(&NaCl), compound_molarity(&NaCl));
-            
+
             strcpy(NaCl.name, find_name(&NaCl));
             struct Bond bonds[50];
-            
+
             int q = predict_bonding(bonds,50, &NaCl);
-            
+
             char bond_type[5][10] = {"single", "single", "double", "triple", "quadruple"};
             int c = q;
             if (c < 1)
                 c = 1;
-    
+
             for (i = 0; i < c; i++) {
                 if (strcmp(bonds[i].atoms[0].name, "") != 0) {
                     printf("%s is involved in a %s bond with %s\n", bonds[i].atoms[0].name, bond_type[bonds[i].num_bonds], bonds[i].atoms[1].name);
                 }
             }
+            float sd[50];
+            int ls = predict_ir(sd, bonds, q);
+            int pqw;
+            for (pqw = 0; pqw < ls; pqw++) {
+                if (sd[pqw] == 0) {
+                    break;
+                }
+                printf("%0.2f\n", sd[pqw]);
+            }
 
         }
     }
-    
-    
+
+
     return 0;
 }
