@@ -167,7 +167,7 @@ int get_electronegative_m(struct Mixture *q, int type) {
         return -1; // No atoms
     }
     for (i = 0; i < q->num_constituents; i++) {
-      printf("%d %s    %f  %d\n", q->constituents[i].present, q->constituents[i].name, q->constituents[i].electronegativity, i);
+      VERBOSE("%d %s    %f  %d\n", q->constituents[i].present, q->constituents[i].name, q->constituents[i].electronegativity, i);
         if (type == 1) {
 
             if (q->constituents[i].electronegativity > current_lowest && q->constituents[i].present == 1) {

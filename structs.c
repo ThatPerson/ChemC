@@ -1,3 +1,5 @@
+
+
 struct Element {
     char name[100];
     char small[5];
@@ -17,6 +19,7 @@ struct Compound {
     char name[50];
     float molar;
     int num_constituents;
+    int present;
 };
 
 struct Bond {
@@ -25,3 +28,16 @@ struct Bond {
     int num_electrons;
     int bond_order;
 };
+
+struct Mixture {
+    struct Compound compounds[50];
+    int num_compounds;
+    int num_constituents;
+    struct Element constituents[50];
+};
+
+/* Ignore below */
+int hideme ( const char * format, ... ) {
+  return 1;
+}
+#define VERBOSE hideme
