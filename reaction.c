@@ -1,10 +1,3 @@
-/*
- * struct Mixture {
-    struct Compound compounds[50];
-    int num_constituents;
-    struct Element constituents[2500];
-};*/
-
 int predict_reaction(struct Mixture * p, struct Mixture * q) {
     int i, s;
     // Get all components in initial reaction mixture.
@@ -79,15 +72,3 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
 
     return 1;
 }
-
-                    bonds[current_bond].atoms[0] = q->constituents[last_atom];
-                    bonds[current_bond].atoms[1] = q->constituents[current_atom];
-                    bonds[current_bond].num_bonds = q->constituents[current_atom].valency - q->constituents[last_atom].valency;
-                    current_bond++;
-                    q->constituents[i].present = 0;
-                    c_left--;
-                    last_atom = current_atom;
-                }
-            }
-        }
-    }*/
