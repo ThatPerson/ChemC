@@ -96,7 +96,7 @@ int find_constituents(struct Compound *q) {
         }
     }
     q->num_constituents = n;
-    return 1;
+    return n;
 }
 
 char * find_name(struct Compound * q) {
@@ -133,7 +133,8 @@ char * find_name(struct Compound * q) {
 }
 
 int get_electronegative(struct Compound *q, int type) {
-    int current_lowest = 0, current_atom = 0, i;
+    float current_lowest = 0;
+    int current_atom = 0, i;
     if (q->num_constituents > 0) {
         current_lowest = q->constituents[0].electronegativity;
         current_atom = 0;
@@ -157,7 +158,8 @@ int get_electronegative(struct Compound *q, int type) {
 }
 
 int get_electronegative_m(struct Mixture *q, int type) {
-    int current_lowest = 0, current_atom = 0, i;
+    float current_lowest = 0;
+    int current_atom = 0, i;
     if (q->num_constituents > 0) {
         current_lowest = q->constituents[0].electronegativity;
         current_atom = 0;
@@ -165,7 +167,9 @@ int get_electronegative_m(struct Mixture *q, int type) {
         return -1; // No atoms
     }
     for (i = 0; i < q->num_constituents; i++) {
+      printf("%d %s    %f  %d\n", q->constituents[i].present, q->constituents[i].name, q->constituents[i].electronegativity, i);
         if (type == 1) {
+
             if (q->constituents[i].electronegativity > current_lowest && q->constituents[i].present == 1) {
                 current_lowest = q->constituents[i].electronegativity;
                 current_atom = i;

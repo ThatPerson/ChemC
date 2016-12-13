@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 
 
     int i;
-    for (i = 0; i < argc - 1; i++) {
+    for (i = 0; i < argc-1; i++) {
         if (strcmp(argv[i], "-pt") == 0) {
             printf("Reading %s\n", argv[i+1]);
             read_periodic_table(argv[i+1]);
@@ -123,6 +123,22 @@ int main(int argc, char **argv) {
                 printf("%0.2f\n", sd[pqw]);
             }
 
+        } else if (strcmp(argv[i], "-r") == 0) {
+            struct Mixture reactants, products;
+            int lk;
+            for (lk = i+1; lk<argc; lk++) {
+                printf("%d\n", lk-i-1);
+                strcpy(reactants.compounds[lk-i-1].name, argv[lk]);
+                find_constituents(&reactants.compounds[lk-i-1]);
+                reactants.num_compounds++;
+            }
+            predict_reaction(&reactants, &products);
+            printf("%d\n", products.num_compounds);
+            printf("%d\n", products.compounds[0].num_constituents);
+            printf("%s\n", products.compounds[1].constituents[0].small);
+            for (lk = 0; lk < products.num_compounds; lk++) {
+                printf("%s\n", find_name(&products.compounds[lk]));
+            }
         }
     }
 
