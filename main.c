@@ -10,6 +10,7 @@
 #define MP_K 1.2025*pow(10, -4) // Melting point prediction constants.
 #define MP_D 3.45*pow(10, -11)
 #define RYDBERG 13.6057
+#define VERBOSE printf
 
 // Haxxy stuff
 #define arrlen(x)  (sizeof(x) / sizeof((x)[0]))
@@ -134,8 +135,8 @@ int main(int argc, char **argv) {
             }
             predict_reaction(&reactants, &products);
             printf("%d\n", products.num_compounds);
-            printf("%d\n", products.compounds[0].num_constituents);
-            printf("%s\n", products.compounds[1].constituents[0].small);
+          //  printf("%d\n", products.compounds[0].num_constituents);
+          //  printf("%s\n", products.compounds[1].constituents[0].small);
             for (lk = 0; lk < products.num_compounds; lk++) {
                 printf("%s\n", find_name(&products.compounds[lk]));
             }

@@ -1,3 +1,12 @@
+int number_remaining(struct Mixture * p) {
+    int i, count = 0;
+    for (i = 0; i < p->num_constituents; i++) {
+        if (p->constituents[i].present == 1)
+            count++;
+    }
+    return count;
+}
+
 int predict_reaction(struct Mixture * p, struct Mixture * q) {
     int i, s;
     // Get all components in initial reaction mixture.
@@ -21,7 +30,7 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
     int current_element_in_compound = 0;
     int current_element_in_mixture = 0;
     for (i = 0; i < c_left; i++) {
-        printf("%s ::::: %s\n", p->constituents[i].small, p->constituents[last_atom].small);
+        VERBOSE("%s ::::: %s\n", p->constituents[i].small, p->constituents[last_atom].small);
         if (strcmp(p->constituents[i].small, p->constituents[last_atom].small) == 0) {
             p->constituents[i].present = 0;
             q->compounds[current_out].constituents[current_element_in_compound] = p->constituents[i];
@@ -31,49 +40,65 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
             break;
         }
     }
-    printf("%s %d\n", q->compounds[0].constituents[0].name, current_element_in_compound);
+    VERBOSE("%s %d\n", q->compounds[0].constituents[0].name, current_element_in_compound);
     c_left--;
-    int qs=0;
     int current_atom, n = 0;
-    int runs = 0;
-    printf("====================== INTO LOOP %d======================\n", c_left);
-    while (c_left > 0) {
+    int reset = 0;
+    VERBOSE("====================== INTO LOOP %d ======================\n", c_left);
+    while (number_remaining(p) > 0) {
 
-        printf("NUM%d\n", c_left);
-        qs = 0;
+        VERBOSE("====================== %d ======================\n", number_remaining(p));
         n = (n==0)?1:0;
         current_atom = get_electronegative_m(p, n);
         for (i = 0; i < p->num_constituents; i++) {
             if (strcmp(p->constituents[i].small, p->constituents[current_atom].small) == 0 && p->constituents[i].present == 1) {
-                qs = 1;
+                VERBOSE("Adding %s to compound. Valency left = %d \n", p->constituents[current_atom].small, p->constituents[last_atom].valency);
                 c_left--;
-                if (p->constituents[last_atom].valency >= p->constituents[current_atom].valency) {
-                    p->constituents[last_atom].valency -= p->constituents[current_atom].valency;
-                    q->constituents[current_element_in_mixture] = p->constituents[current_atom];
-                    q->compounds[current_out].constituents[current_element_in_compound] = p->constituents[current_atom];
-                    printf("%s %d\n", q->compounds[current_out].constituents[current_element_in_compound].name, current_element_in_compound);
+                if (reset == 1) {
+                    // Add it regardless.
+                    VERBOSE("RESET ALGO\n");
+                    last_atom = current_atom;
+                    q->compounds[current_out].constituents[0] = p->constituents[i];
+                    p->constituents[i].present = 0;
                     current_element_in_compound++;
-                    current_element_in_mixture++;
-                    p->constituents[current_out].valency = 0;
-                    p->constituents[current_out].present = 0;
+                    reset = 0;
                 } else {
-                    if (p->constituents[last_atom].valency == 0) {
-                        q->compounds[current_out].num_constituents = current_element_in_compound;
-                        current_out++;
-                        q->num_compounds = current_out;
-                        last_atom = current_atom;
-                        current_element_in_compound = 0;
-                        printf("HELLO WORLD\n");
-                        q->num_compounds++;
+
+                    if (p->constituents[last_atom].valency >= p->constituents[i].valency) {
+                        VERBOSE("ADDITION WITHOUT REMOVAL ALGO\n");
+                        p->constituents[last_atom].valency -= p->constituents[i].valency;
+                        q->constituents[current_element_in_mixture] = p->constituents[i];
+                        q->compounds[current_out].constituents[current_element_in_compound] = p->constituents[i];
+                        current_element_in_compound++;
+                        current_element_in_mixture++;
+                        p->constituents[i].valency = 0;
+                        p->constituents[i].present = 0;
                     } else {
-                        p->constituents[current_atom].valency -= p->constituents[last_atom].valency;
-                        p->constituents[last_atom].valency = 0;
-                        p->constituents[last_atom].present = 0;
-                        q->constituents[current_element_in_mixture] = p->constituents[current_atom];
-                        q->compounds[current_out].constituents[current_element_in_compound] = p->constituents[current_atom];
-                        last_atom = current_atom;
-                    }
+                        if (p->constituents[last_atom].valency == 0) {
+                            VERBOSE("VALENCY 0\n");
+                            q->compounds[current_out].num_constituents = current_element_in_compound;
+                            p->constituents[last_atom].present = 0;
+                            current_out++;
+                            q->num_compounds = current_out;
+                            last_atom = i;
+                            reset = 1;
+                            //n = 0;
+                            current_element_in_compound = 0;
+                            VERBOSE("Compound Finished.\n");
+                            q->num_compounds++;
+                          } else {
+                            VERBOSE("REMOVAL ALGO\n");
+                            p->constituents[i].valency -= p->constituents[last_atom].valency;
+                            p->constituents[last_atom].valency = 0;
+                            p->constituents[last_atom].present = 0;
+                            q->constituents[current_element_in_mixture] = p->constituents[i];
+                            q->compounds[current_out].constituents[current_element_in_compound] = p->constituents[i];
+                            last_atom = i;
+                          }
+                      }
                 }
+
+                break;
 
             }
             /*if (qs == 1)
