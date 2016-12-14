@@ -31,7 +31,7 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
     int current_element_in_compound = 0;
     int current_element_in_mixture = 0;
     for (i = 0; i < c_left; i++) {
-        VERBOSE("%s ::::: %s\n", p->constituents[i].small, p->constituents[last_atom].small);
+        //VERBOSE("%s ::::: %s\n", p->constituents[i].small, p->constituents[last_atom].small);
         if (strcmp(p->constituents[i].small, p->constituents[last_atom].small) == 0) {
             p->constituents[i].present = 0;
             q->compounds[current_out].constituents[current_element_in_compound] = p->constituents[i];
@@ -41,7 +41,7 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
             break;
         }
     }
-    VERBOSE("%s %d\n", q->compounds[0].constituents[0].name, current_element_in_compound);
+    //VERBOSE("%s %d\n", q->compounds[0].constituents[0].name, current_element_in_compound);
     c_left--;
     int current_atom;
     int reset = 0;
@@ -75,9 +75,10 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
                         current_element_in_mixture++;
                         p->constituents[i].valency = 0;
                         p->constituents[i].present = 0;
+                        n = (n==0)?1:0;
                     } else {
                         if (p->constituents[last_atom].valency == 0) {
-                            VERBOSE("VALENCY 0\n");
+                            //printf("V\n"); // Code doesn't use same logic without this line so...
                             q->compounds[current_out].num_constituents = current_element_in_compound;
                             p->constituents[last_atom].present = 0;
                             current_out++;
@@ -93,8 +94,11 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
                             p->constituents[i].valency -= p->constituents[last_atom].valency;
                             p->constituents[last_atom].valency = 0;
                             p->constituents[last_atom].present = 0;
+                            p->constituents[i].present = 0;
                             q->constituents[current_element_in_mixture] = p->constituents[i];
                             q->compounds[current_out].constituents[current_element_in_compound] = p->constituents[i];
+                            current_element_in_compound++;
+                            current_element_in_mixture++;
                             last_atom = i;
                           }
                       }
