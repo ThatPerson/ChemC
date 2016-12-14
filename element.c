@@ -10,7 +10,7 @@ int group(struct Element *p) {
 
 void get_shells(struct Element * p) {
     /**
-     * Purpose:     Predicts which orbitals electrons fill at lowest energy state. 
+     * Purpose:     Predicts which orbitals electrons fill at lowest energy state.
      *              Does not take into account penetration of orbitals - so it may
      *              not fill properly.
      * Arguments:   Pointer to element struct.
@@ -18,11 +18,11 @@ void get_shells(struct Element * p) {
      *              up the shells array in the element, filling from lowest (ie 1s
      *              to highest (ie to 2s, 2p, 3s, 3p etc).
      * Issues:      Does not take into account penetration - so fills 3d before 4s.
-     *              Additionally, does not take into account individual energy 
+     *              Additionally, does not take into account individual energy
      *              levels - so Cu and Cr are not done properly. Gives reasonable
      *              approximation for < 20 electrons.
      */
-    
+
     int n = 0, l =0, m = 0, a_n = p->num_electrons, i, q;
     while (a_n > 0) {
         q = 0;
@@ -59,7 +59,7 @@ void get_shells(struct Element * p) {
             a_n--;
         }
     }
-    
+
     return;
 }
 
@@ -69,7 +69,7 @@ float predict_electron_energy(struct Element * p, int n, int l, int m, int x, in
      * Arguments:   nlm. x - amount of electron shielding. p - pointer to atom.
      * Method:      1.
      *                  Uses Rydberg equation, taking x as the shielding.
-     *              2. 
+     *              2.
      *                  Same as 1 but uses Slater's rules to predict the shielding.
      *              Legacy switches mode - 1 works better for prediction, but 2 is more accurate.
      */
@@ -77,18 +77,18 @@ float predict_electron_energy(struct Element * p, int n, int l, int m, int x, in
     float Z;
     if (legacy == 1) {
         Z = p->atomic_number - x;
-        
+
     } else {
         float S = 0;
         int i, j, k, s_n = n - 1;
-        
+
         int ps[3] = {0, 0, 0};
         for (i = 0; i < 5; i++) {
             for (j = 0; j < 5; j++) {
-                
+
                 ps[0] += p->shells[s_n][i][j];
             }
-            
+
         }
         ps[0] = ps[0] - 1;
         for (i = 0; i < 5; i++) {
@@ -107,9 +107,9 @@ float predict_electron_energy(struct Element * p, int n, int l, int m, int x, in
         S = 0.35 * ps[0] + 0.85*ps[1] + 1*ps[2];
         Z = p->atomic_number - S;
     }
-        
+
     energy = -RYDBERG * (pow(Z, 2) / pow(n, 2));
-    
+
     return energy;
 }
 
@@ -137,39 +137,6 @@ float predict_valence_electron_energy(struct Element *p) {
     }
     energy = predict_electron_energy(p, c_n+1, c_l, c_m-c_l, c, 0);
     return energy;
-}
-
-void print_element(struct Element *p) {
-    printf("Name:\t\t\t%s\nSmall:\t\t\t%s\nGroup:\t\t\t%d\nAtomic Number:\t\t%d\nMolar Mass:\t\t%0.2f\nAtomic Radius:\t\t%0.2f\nElectronegativity:\t%0.2f\nEnergy:\t\t\t%0.2f eV\nElectrons;  \n", p->name, p->small, group(p), p->atomic_number, p->molar, p->atomic_radius, p->electronegativity, predict_valence_electron_energy(p));
-    int c, w, n, l, m;
-    char ns[4] = {'s', 'p', 'd', 'f'};
-    char ls[4][5][6] = {   {"","","","",""},
-                            {"x", "y", "z", "", ""},
-                            {"xy", "yz", "xz", "z2", "x2-y2"},
-                            {"","","","",""}};
-    for (n = 0; n < 5; n++) {
-        for (l = 0; l < 5; l++) {
-            w = 0;
-            for (m = 0; m < 5; m++) {
-                if (p->shells[n][l][m] != 0) {
-                    printf("\t%d%c(%s): %d (%0.2f eV)\n", n+1, ns[l], ls[l][m], p->shells[n][l][m], predict_electron_energy(p, n+1, l, m-l, c, 0));
-                    w += p->shells[n][l][m];
-                }
-            }
-            c += w;
-        }
-    }
-    return;
-}
-    
-int find_element(char * str) {
-    int i;
-    for (i = 0; i < pt_length; i++) {
-        if (strcmp(str, periodic_table[i].small) == 0 || strcmp(str, periodic_table[i].name) == 0) {
-            return i;
-        }
-    }
-    return -1;
 }
 
 int get_valence_electrons(struct Element *p) {
@@ -200,14 +167,48 @@ int atom_valency(struct Element *p) {
     return valency;
 }
 
+
+void print_element(struct Element *p) {
+    printf("Name:\t\t\t%s\nSmall:\t\t\t%s\nGroup:\t\t\t%d\nAtomic Number:\t\t%d\nMolar Mass:\t\t%0.2f\nAtomic Radius:\t\t%0.2f\nElectronegativity:\t%0.2f\nEnergy:\t\t\t%0.2f eV\nElectrons;  \nValency:\t\t\t%d\n", p->name, p->small, group(p), p->atomic_number, p->molar, p->atomic_radius, p->electronegativity, predict_valence_electron_energy(p), atom_valency(p));
+    int c, w, n, l, m;
+    char ns[4] = {'s', 'p', 'd', 'f'};
+    char ls[4][5][6] = {   {"","","","",""},
+                            {"x", "y", "z", "", ""},
+                            {"xy", "yz", "xz", "z2", "x2-y2"},
+                            {"","","","",""}};
+    for (n = 0; n < 5; n++) {
+        for (l = 0; l < 5; l++) {
+            w = 0;
+            for (m = 0; m < 5; m++) {
+                if (p->shells[n][l][m] != 0) {
+                    printf("\t%d%c(%s): %d (%0.2f eV)\n", n+1, ns[l], ls[l][m], p->shells[n][l][m], predict_electron_energy(p, n+1, l, m-l, c, 0));
+                    w += p->shells[n][l][m];
+                }
+            }
+            c += w;
+        }
+    }
+    return;
+}
+
+int find_element(char * str) {
+    int i;
+    for (i = 0; i < pt_length; i++) {
+        if (strcmp(str, periodic_table[i].small) == 0 || strcmp(str, periodic_table[i].name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
 int is_element_cation(struct Element *p) {
     int outershell = get_valence_electrons(p);
     if (outershell < 8) {
-        if (outershell < 4) 
+        if (outershell < 4)
             return 1;
         else
             return 0;
     }
     return -1;
 }
-

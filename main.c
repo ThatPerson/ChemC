@@ -137,6 +137,7 @@ int main(int argc, char **argv) {
             for (lk = 0; lk < products.num_compounds; lk++) {
                 printf("%s\n", find_name(&products.compounds[lk]));
             }
+            
         }
     }
 

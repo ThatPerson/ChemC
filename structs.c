@@ -41,3 +41,4 @@ int hideme ( const char * format, ... ) {
   return 1;
 }
 #define VERBOSE hideme
+/* Setting VERBOSE to hideme removes the algorithm printo ut on prediction calculations */

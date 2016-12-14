@@ -16,7 +16,7 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
 
         for (s = 0; s < p->compounds[i].num_constituents; s++) {
             p->constituents[p->num_constituents] = p->compounds[i].constituents[s]; // Get copying function sorted. (actually pointers so shouldn't matter.
-            p->constituents[p->num_constituents].valency = atom_valency(&p->constituents[s]);
+            p->constituents[p->num_constituents].valency = atom_valency(&p->constituents[p->num_constituents]);
             p->constituents[p->num_constituents].present = 1;
             p->num_constituents++;
 
@@ -25,7 +25,8 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
     // loop from 1 to the number of constituent atoms.
   //   // Same scheme as predict bonding to make it easier to deal with. Essentially the algorithm is identical.
     int current_out = 0;
-    int last_atom = get_electronegative_m(p, 0);
+    int n = 0;
+    int last_atom = get_electronegative_m(p, n);
     int c_left = p->num_constituents;
     int current_element_in_compound = 0;
     int current_element_in_mixture = 0;
@@ -42,7 +43,7 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
     }
     VERBOSE("%s %d\n", q->compounds[0].constituents[0].name, current_element_in_compound);
     c_left--;
-    int current_atom, n = 0;
+    int current_atom;
     int reset = 0;
     VERBOSE("====================== INTO LOOP %d ======================\n", c_left);
     while (number_remaining(p) > 0) {
@@ -67,6 +68,7 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
                     if (p->constituents[last_atom].valency >= p->constituents[i].valency) {
                         VERBOSE("ADDITION WITHOUT REMOVAL ALGO\n");
                         p->constituents[last_atom].valency -= p->constituents[i].valency;
+                        VERBOSE("NEW VALENCY %d :::: %s %d\n", p->constituents[last_atom].valency, p->constituents[i].small, p->constituents[i].valency);
                         q->constituents[current_element_in_mixture] = p->constituents[i];
                         q->compounds[current_out].constituents[current_element_in_compound] = p->constituents[i];
                         current_element_in_compound++;
@@ -79,10 +81,10 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
                             q->compounds[current_out].num_constituents = current_element_in_compound;
                             p->constituents[last_atom].present = 0;
                             current_out++;
-                            q->num_compounds = current_out;
+                            q->num_compounds = current_out + 1;
                             last_atom = i;
                             reset = 1;
-                            //n = 0;
+                            n = 0;
                             current_element_in_compound = 0;
                             VERBOSE("Compound Finished.\n");
                             q->num_compounds++;
@@ -105,6 +107,7 @@ int predict_reaction(struct Mixture * p, struct Mixture * q) {
                 break;*/
         }
     }
+    q->num_compounds = current_out + 1;
     q->compounds[current_out].num_constituents = current_element_in_compound;
     return 1;
 }
