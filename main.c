@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
                                 }
                         }
                 }
-                if (strcmp(argv[i], "-h") == 0) {
+                if (strcmp(argv[i], "help") == 0) {
                         printf("-pt\t\t\tLoad periodic table from file.\nscript\t\t\tLoad script (not implemented)\nelement\t\t\tPrint out element\nlength\t\t\tPredict bond length\nmass\t\t\tCalculate molarity of elements. Given multiple arguments will calculate reduced mass.\ncompound\t\t\tPrint out calculated compound data.\nreaction\t\t\tPredict outcome of reaction.\nAll arguments succeeding these will be taken as arguments to those functions.\n");
                 }
         }
