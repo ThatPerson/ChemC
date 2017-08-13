@@ -77,16 +77,16 @@ int main(int argc, char **argv) {
                                 printf("Reading %s\n", argv[i+1]);
                                 read_periodic_table(argv[i+1]);
                                 initialise(argv[i+1]);
-                        } else if (strcmp(argv[i], "-s") == 0) {
+                        } else if (strcmp(argv[i], "script") == 0) {
                                 printf("Script in %s\n", argv[i+1]);
-                        } else if (strcmp(argv[i], "-e") == 0) {
+                        } else if (strcmp(argv[i], "element") == 0 || argv[i][0] == 'e') {
                                 print_element(&periodic_table[find_element(argv[i+1])]);
-                        } else if (strcmp(argv[i], "-l") == 0) {
+                        } else if (strcmp(argv[i], "length") == 0  || argv[i][0] == 'l') {
                                 if (i < argc-2)
                                         printf("%0.3f\n", periodic_table[find_element(argv[i+1])].atomic_radius + periodic_table[find_element(argv[i+2])].atomic_radius);
                                 else
                                         printf("%0.3f\n", 2*periodic_table[find_element(argv[i+1])].atomic_radius);
-                        } else if (strcmp(argv[i], "-m") == 0) {
+                        } else if (strcmp(argv[i], "mass") == 0) {
                                 if (i < argc-2) {
                                         float m[2] = {periodic_table[find_element(argv[i+1])].molar, periodic_table[find_element(argv[i+2])].molar};
                                         printf("%0.3f\n", (m[0]*m[1])/(m[0]+m[1]));
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
                                         float m = periodic_table[find_element(argv[i+1])].molar;
                                         printf("%0.3f\n", m/2);
                                 }
-                        } else if (strcmp(argv[i], "-c") == 0) {
+                        } else if (strcmp(argv[i], "compound") == 0  || argv[i][0] == 'c') {
                                 struct Compound NaCl;
                                 strcpy(NaCl.name, argv[i+1]);
                                 find_constituents(&NaCl);
@@ -126,7 +126,11 @@ int main(int argc, char **argv) {
                                         printf("%0.2f\n", sd[pqw]);
                                 }
 
-                        } else if (strcmp(argv[i], "-r") == 0) {
+                                printf("Melting Point: %0.2f\n", predict_melting_point(&NaCl, 0));
+                                printf("Melting Point: %0.2f\n", predict_melting_point(&NaCl, 1));
+
+
+                        } else if (strcmp(argv[i], "reaction") == 0 || argv[i][0] == 'r') {
                                 struct Mixture reactants, products;
                                 int lk;
                                 for (lk = i+1; lk<argc; lk++) {
@@ -142,7 +146,7 @@ int main(int argc, char **argv) {
                         }
                 }
                 if (strcmp(argv[i], "-h") == 0) {
-                        printf("-pt\t\t\tLoad periodic table from file.\n-s\t\t\tLoad script (not implemented)\n-e\t\t\tPrint out element\n-l\t\t\tPredict bond length\n-m\t\t\tCalculate molarity of elements. Given multiple arguments will calculate reduced mass.\n-c\t\t\tPrint out calculated compound data.\n-r\t\t\tPredict outcome of reaction.\nAll arguments succeeding these will be taken as arguments to those functions.\n");
+                        printf("-pt\t\t\tLoad periodic table from file.\nscript\t\t\tLoad script (not implemented)\nelement\t\t\tPrint out element\nlength\t\t\tPredict bond length\nmass\t\t\tCalculate molarity of elements. Given multiple arguments will calculate reduced mass.\ncompound\t\t\tPrint out calculated compound data.\nreaction\t\t\tPredict outcome of reaction.\nAll arguments succeeding these will be taken as arguments to those functions.\n");
                 }
         }
 
