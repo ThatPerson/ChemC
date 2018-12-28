@@ -117,17 +117,18 @@ int main(int argc, char **argv) {
                                         }
                                 }
                                 float sd[50];
-                                int ls = predict_ir(sd, bonds, q);
+                            
+                                float ls = predict_vib_spectrum(sd, bonds, c);
                                 int pqw;
-                                for (pqw = 0; pqw < ls; pqw++) {
+                                /*for (pqw = 0; pqw < ls; pqw++) {
                                         if (sd[pqw] == 0) {
                                                 break;
                                         }
                                         printf("%0.2f\n", sd[pqw]);
-                                }
-
-                                printf("Melting Point: %0.2f\n", predict_melting_point(&NaCl, 0));
-                                printf("Melting Point: %0.2f\n", predict_melting_point(&NaCl, 1));
+                                }*/
+                                printf("%f\n", ls);
+                                printf("Melting Point (A1): %0.2f\n", predict_melting_point(&NaCl, 0));
+                                printf("Melting Point (A2): %0.2f\n", predict_melting_point(&NaCl, 1));
 
 
                         } else if (strcmp(argv[i], "reaction") == 0 || argv[i][0] == 'r') {
@@ -146,7 +147,7 @@ int main(int argc, char **argv) {
                         }
                 }
                 if (strcmp(argv[i], "help") == 0) {
-                        printf("-pt\t\t\tLoad periodic table from file.\nscript\t\t\tLoad script (not implemented)\nelement\t\t\tPrint out element\nlength\t\t\tPredict bond length\nmass\t\t\tCalculate molarity of elements. Given multiple arguments will calculate reduced mass.\ncompound\t\t\tPrint out calculated compound data.\nreaction\t\t\tPredict outcome of reaction.\nAll arguments succeeding these will be taken as arguments to those functions.\n");
+                        printf("-pt\t\t\tLoad periodic table from file.\nscript\t\t\tLoad script (not implemented)\nelement\t\t\tPrint out element\nlength\t\t\tPredict bond length\nmass\t\t\tCalculate reduced mass of two elements.\ncompound\t\t\tPrint out calculated compound data.\nreaction\t\t\tPredict outcome of reaction.\nAll arguments succeeding these will be taken as arguments to those functions.\n");
                 }
         }
 
